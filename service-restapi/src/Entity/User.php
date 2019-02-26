@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Entity\Account\AbstractAccount;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
+use App\Entity\Account\iAccount;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -38,6 +39,16 @@ class User
      * @ORM\Column(type="datetime")
      */
     private $updated_at;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Account\AbstractAccount", mappedBy="user")
+     */
+    private $accounts;
+
+    public function __construct()
+    {
+        $this->accounts = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -88,6 +99,37 @@ class User
     public function setUpdatedAt(\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|iAccount[]
+     */
+    public function getAccounts(): Collection
+    {
+        return $this->accounts;
+    }
+
+    public function addAccount(iAccount $account): self
+    {
+        if (!$this->accounts->contains($account)) {
+            $this->accounts[] = $account;
+            $account->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAccount(iAccount $account): self
+    {
+        if ($this->accounts->contains($account)) {
+            $this->accounts->removeElement($account);
+            // set the owning side to null (unless already changed)
+            if ($account->getUser() === $this) {
+                $account->setUser(null);
+            }
+        }
 
         return $this;
     }
