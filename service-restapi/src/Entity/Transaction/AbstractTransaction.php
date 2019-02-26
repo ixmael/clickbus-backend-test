@@ -2,6 +2,7 @@
 
 namespace App\Entity\Transaction;
 
+use App\Entity\Account\AbstractAccount;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,6 +26,12 @@ abstract class AbstractTransaction
      */
     protected $kind;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Account\AbstractAccount", inversedBy="transactions")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $account;
+
     public function getKind(): ?string
     {
         return $this->kind;
@@ -40,5 +47,17 @@ abstract class AbstractTransaction
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getAccount(): ?AbstractAccount
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?AbstractAccount $account): self
+    {
+        $this->account = $account;
+
+        return $this;
     }
 }
