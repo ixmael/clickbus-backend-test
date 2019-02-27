@@ -4,12 +4,15 @@ namespace App\Util\Calculator;
 
 use App\Entity\Account\iAccount;
 
-class CreditCalculator implements iCalculator {
-    public function __construct(iAccount $account) {
+class CreditCalculator implements iCalculator
+{
+    public function __construct(iAccount $account)
+    {
         $this->account = $account;
     }
 
-    public function getTotal($amount) {
+    public function getTotal($amount)
+    {
         $amountItems = [];
 
         // Amount to withdraw
@@ -24,9 +27,11 @@ class CreditCalculator implements iCalculator {
         });
     }
 
-    public function canWithdraw($amount) {
+    public function canWithdraw($amount)
+    {
         $totalToWithdraw = $this->getTotal($amount);
-        if ($this->account->getCredit() - $totalToWithdraw >= 0) {
+        if ($this->account->getCredit() - $totalToWithdraw >= 0)
+        {
             return true;
         }
 

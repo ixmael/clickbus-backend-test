@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
+
+use App\Entity\User;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,37 +16,90 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class UserRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    private $em;
+
+    public function __construct(RegistryInterface $registry, EntityManagerInterface $em)
     {
         parent::__construct($registry, User::class);
+        $this->em = $em;
     }
 
-    // /**
-    //  * @return User[] Returns an array of User objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getAll()
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?User
+    public function exists($id)
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('u.id = :id')
+            ->setParameter('id', $id)
+            ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getSingleResult();
     }
-    */
+
+    public function get($id)
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.id = :id')
+            ->setParameter('id', $id)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getSingleResult();
+    }
+
+    public function add(array $data)
+    {
+        $user = new User();
+        $user->setEmail($data['email']);
+        $user->setName($data['name']);
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
+    }
+
+    public function update($id, array $data)
+    {
+        $user = $this->exists($id);
+        if ($user)
+        {
+            if (\array_key_exists('name', $data))
+            {
+                $user->setName($data['name']);
+            }
+
+            if (\array_key_exists('email', $data))
+            {
+                $user->setEmail($data['email']);
+            }
+
+            $this->em->persist($user);
+            $this->em->flush();
+
+            return $user;
+        }
+
+        return null;
+    }
+
+    public function del($id)
+    {
+        $user = $this->exists($id);
+
+        if ($user)
+        {
+            $this->em->remove($user);
+            $this->em->flush();
+
+            return true;
+        }
+
+        return false;
+    }
 }

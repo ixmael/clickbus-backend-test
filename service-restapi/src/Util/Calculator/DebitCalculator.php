@@ -4,12 +4,15 @@ namespace App\Util\Calculator;
 
 use App\Entity\Account\iAccount;
 
-class DebitCalculator implements iCalculator {
-    public function __construct(iAccount $account) {
+class DebitCalculator implements iCalculator
+{
+    public function __construct(iAccount $account)
+    {
         $this->account = $account;
     }
 
-    public function getTotal($amount) {
+    public function getTotal($amount)
+    {
         $amountItems = [];
 
         // Amount to withdraw
@@ -20,9 +23,11 @@ class DebitCalculator implements iCalculator {
         });
     }
 
-    public function canWithdraw($amount) {
+    public function canWithdraw($amount)
+    {
         $totalToWithdraw = $this->getTotal($amount);
-        if ($this->account->getAmount() - $totalToWithdraw >= 0) {
+        if ($this->account->getAmount() - $totalToWithdraw >= 0)
+        {
             return true;
         }
 

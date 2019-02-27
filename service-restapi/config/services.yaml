@@ -25,3 +25,14 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    datetime_normalizer:
+        class: App\Util\Normalizer\DateTimeNormalizer
+        tags:
+            - { name: serializer.normalizer }
+
+    get_set_method_normalizer:
+        class: Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer
+        public: false
+        tags: [serializer.normalizer]
+
