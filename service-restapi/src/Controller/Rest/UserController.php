@@ -19,7 +19,6 @@ final class UserController extends AbstractController
 
     public function __construct(UserRepository $userRepository)
     {
-        print_r($userRepository, true);
         $this->userRepository = $userRepository;
     }
 
