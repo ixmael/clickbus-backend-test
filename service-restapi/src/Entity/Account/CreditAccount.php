@@ -16,6 +16,11 @@ class CreditAccount extends AbstractAccount implements iAccount
      */
     private $credit;
 
+    /**
+     * @ORM\Column(type="decimal", precision=32, scale=2)
+     */
+    private $limit_credit;
+
     public function getCredit()
     {
         return $this->credit;
@@ -30,5 +35,17 @@ class CreditAccount extends AbstractAccount implements iAccount
 
     public function getKind() {
         return parent::CREDIT_KIND;
+    }
+
+    public function getLimitCredit()
+    {
+        return $this->limit_credit;
+    }
+
+    public function setLimitCredit($limit_credit): self
+    {
+        $this->limit_credit = $limit_credit;
+
+        return $this;
     }
 }

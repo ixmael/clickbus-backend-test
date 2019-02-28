@@ -66,6 +66,7 @@ class AccountRepository extends ServiceEntityRepository
             {
                 $account = new CreditAccount();
                 $account->setCredit($data['credit']);
+                $account->setLimitCredit($data['limit_credit']);
             }
             else
             {
@@ -98,14 +99,17 @@ class AccountRepository extends ServiceEntityRepository
                 {
                     $updateElements[] = 'amount = NULL';
                     $updateElements[] = 'credit = :credit';
+                    $updateElements[] = 'limit_credit = :limit_credit';
 
                     $params['kind'] = AbstractAccount::CREDIT_KIND;
                     $params['credit'] = $data['credit'];
+                    $params['limit_credit'] = $data['limit_credit'];
                 }
                 elseif ($data['account_kind'] === 'debit')
                 {
                     $updateElements[] = 'amount = :amount';
                     $updateElements[] = 'credit = NULL';
+                    $updateElements[] = 'limit_credit = NULL';
 
                     $params['kind'] = AbstractAccount::DEBIT_KIND;
                     $params['amount'] = $data['amount'];

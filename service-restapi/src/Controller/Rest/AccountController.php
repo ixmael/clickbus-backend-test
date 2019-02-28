@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use App\Repository\AccountRepository;
+use App\Entity\Account\AbstractAccount;
 
 /**
  * @Route("api/cuentas")
@@ -73,13 +74,12 @@ final class AccountController extends AbstractController
                 ['content-type' => 'application/json']
             );
         }
-        else if (!$this->hasRequiredFields($requestData))
+
+        // Check if the data required exists in the request body
+        $checkedFields = $this->checkFieldsToCreate($requestData, $serializer);
+        if (gettype($checkedFields) === 'object' && get_class($checkedFields) === Response::class)
         {
-            return new Response(
-                $serializer->serialize([ 'message' => "The request data has not the fields required" ], 'json'),
-                Response::HTTP_BAD_REQUEST,
-                ['content-type' => 'application/json']
-            );
+            return $checkedFields;
         }
 
         $responseCode = Response::HTTP_CONFLICT;
@@ -126,13 +126,9 @@ final class AccountController extends AbstractController
                 ['content-type' => 'application/json']
             );
         }
-        else if (!$this->hasRequiredFields($requestData))
-        {
-            return new Response(
-                $serializer->serialize([ 'message' => "The request data has not the fields required" ], 'json'),
-                Response::HTTP_BAD_REQUEST
-            );
-        }
+
+        // Check if the request to update has the required data
+        $this->checkFieldsToUpdate($requestData, $serializer);
 
         $responseCode = Response::HTTP_CONFLICT;
         $result = [
@@ -203,15 +199,65 @@ final class AccountController extends AbstractController
      * @TODO: validate if account_kind is 'credit' exists the key 'credit'
      * @TODO: validate if account_kind is 'debit' exists the key 'amount'
      */
-    private function hasRequiredFields($data)
+    private function checkFieldsToCreate($data, $serializer)
     {
-        if (array_key_exists('user_id', $data) &&
-            array_key_exists('account_kind', $data) &&
-            (array_key_exists('amount', $data) || array_key_exists('credit', $data)))
+        if (!array_key_exists('user_id', $data))
         {
-            return true;
+            return new Response(
+                $serializer->serialize([ 'message' => "There is not 'user_id' in the request data" ], 'json'),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
         }
 
-        return false;
+        if (!array_key_exists('account_kind', $data))
+        {
+            return new Response(
+                $serializer->serialize([ 'message' => "There is not 'accounts_kind' in the request data" ], 'json'),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        }
+
+        if ($data['account_kind'] === AbstractAccount::CREDIT_KIND &&
+            (!\array_key_exists('credit', $data) || !\array_key_exists('limit_credit', $data)))
+        {
+            return new Response(
+                $serializer->serialize([ 'message' => 'The data is not complete to create a credit account' ], 'json'),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        }
+
+        if ($data['account_kind'] === AbstractAccount::DEBIT_KIND && !\array_key_exists('amount', $data))
+        {
+            return new Response(
+                $serializer->serialize([ 'message' => 'The data is not complete to create a debit account' ], 'json'),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        }
+    }
+
+    private function checkFieldsToUpdate($data, $serializer)
+    {
+        if ($data['account_kind'] === AbstractAccount::CREDIT_KIND &&
+            (!\array_key_exists('credit', $data) || !\array_key_exists('limit_credit', $data)))
+        {
+            return new Response(
+                $serializer->serialize([ 'message' => 'The data is not complete to update a credit account' ], 'json'),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        }
+
+        if ($data['account_kind'] === AbstractAccount::DEBIT_KIND && !\array_key_exists('amount', $data))
+        {
+            return new Response(
+                $serializer->serialize([ 'message' => 'The data is not complete to update a debit account' ], 'json'),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        }
     }
 }
