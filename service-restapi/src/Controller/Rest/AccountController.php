@@ -8,31 +8,32 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 
+use App\Repository\AccountRepository;
+
 /**
  * @Route("api/cuentas")
  */
 final class AccountController extends AbstractController
 {
-    /*
-    private $userRepository;
+    private $accountRepository;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(AccountRepository $accountRepository)
     {
-        print_r($userRepository, true);
-        $this->userRepository = $userRepository;
+        $this->accountRepository = $accountRepository;
     }
-    */
 
     /**
      * @Route("/", methods={"GET"})
      */
     public function getAccounts(Request $request, SerializerInterface $serializer)
     {
-      return new Response(
-          $serializer->serialize([], 'json'),
-          Response::HTTP_OK,
-          ['content-type' => 'application/json']
-      );
+        $accounts = $this->accountRepository->getAll();
+
+        return new Response(
+            $serializer->serialize([ 'total' => count($accounts), 'data' => $accounts ], 'json', ['groups' => 'basic']),
+            Response::HTTP_OK,
+            ['content-type' => 'application/json']
+        );
     }
 
     /**
@@ -40,9 +41,19 @@ final class AccountController extends AbstractController
      */
     public function loadAccount(Request $request, SerializerInterface $serializer, $id)
     {
+        $account = $this->accountRepository->exists($id);
+        if ($account)
+        {
+            return new Response(
+                $serializer->serialize([ 'data' => $account ], 'json', ['groups' => 'basic']),
+                Response::HTTP_OK,
+                ['content-type' => 'application/json']
+            );
+        }
+
         return new Response(
-            $serializer->serialize([], 'json'),
-            Response::HTTP_OK,
+            $serializer->serialize([ 'message' => "The account with id = " . $id . " not exists" ], 'json'),
+            Response::HTTP_NOT_FOUND,
             ['content-type' => 'application/json']
         );
     }
@@ -52,9 +63,50 @@ final class AccountController extends AbstractController
      */
     public function addAccount(Request $request, SerializerInterface $serializer)
     {
+        $requestData = json_decode($request->getContent(), true);
+
+        if (!$requestData)
+        {
+            return new Response(
+                $serializer->serialize([ 'message' => "The request not has data to create an account" ], 'json'),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        }
+        else if (!$this->hasRequiredFields($requestData))
+        {
+            return new Response(
+                $serializer->serialize([ 'message' => "The request data has not the fields required" ], 'json'),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        }
+
+        $responseCode = Response::HTTP_CONFLICT;
+        $result = [
+            'result' => 'failed',
+            'message' => '',
+        ];
+        $groups = [];
+
+        try
+        {
+            $account = $this->accountRepository->add($requestData);
+
+            $result['id'] = $account->getId();
+            $result['result'] = 'created';
+            $groups = ['groups' => 'basic'];
+            unset($result['message']);
+            $responseCode = Response::HTTP_OK;
+        }
+        catch(\Exception $e)
+        {
+            $result['message'] = $e->getMessage();
+        }
+
         return new Response(
-            $serializer->serialize([], 'json'),
-            Response::HTTP_OK,
+            $serializer->serialize($result, 'json', $groups),
+            $responseCode,
             ['content-type' => 'application/json']
         );
     }
@@ -64,9 +116,52 @@ final class AccountController extends AbstractController
      */
     public function updateAccount(Request $request, SerializerInterface $serializer, $id)
     {
+        $requestData = json_decode($request->getContent(), true);
+
+        if (!$requestData)
+        {
+            return new Response(
+                $serializer->serialize([ 'message' => "The request not has data to update an account" ], 'json'),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        }
+        else if (!$this->hasRequiredFields($requestData))
+        {
+            return new Response(
+                $serializer->serialize([ 'message' => "The request data has not the fields required" ], 'json'),
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        $responseCode = Response::HTTP_CONFLICT;
+        $result = [
+            'result' => 'failed',
+            'message' => '',
+        ];
+        $groups = [];
+
+        try
+        {
+            $account = $this->accountRepository->update($id, $requestData);
+
+            if ($account)
+            {
+              $result['id'] = $account->getId();
+              $result['result'] = 'updated';
+              $groups = ['groups' => 'basic'];
+              unset($result['message']);
+              $responseCode = Response::HTTP_OK;
+            }
+        }
+        catch(\Exception $e)
+        {
+            $result['message'] = $e->getMessage();
+        }
+
         return new Response(
-            $serializer->serialize([], 'json'),
-            Response::HTTP_OK,
+            $serializer->serialize($result, 'json', $groups),
+            $responseCode,
             ['content-type' => 'application/json']
         );
     }
@@ -76,23 +171,47 @@ final class AccountController extends AbstractController
      */
     public function delUser(Request $request, SerializerInterface $serializer, $id)
     {
+        $responseCode = Response::HTTP_CONFLICT;
+
+        $result = [
+            'result' => 'failed',
+            'message' => '',
+        ];
+
+        try
+        {
+            $isDeleted = $this->accountRepository->del($id);
+
+            $result['result'] = 'deleted';
+            unset($result['message']);
+            $responseCode = Response::HTTP_OK;
+        }
+        catch(\Exception $e)
+        {
+            $result['message'] = $e->getMessage();
+        }
+
         return new Response(
-            $serializer->serialize([], 'json'),
-            Response::HTTP_OK,
+            $serializer->serialize($result, 'json'),
+            $responseCode,
             ['content-type' => 'application/json']
         );
     }
 
-    /*
+    /**
+     * @TODO: validate if account_kind is 'credit' or 'debit'.
+     * @TODO: validate if account_kind is 'credit' exists the key 'credit'
+     * @TODO: validate if account_kind is 'debit' exists the key 'amount'
+     */
     private function hasRequiredFields($data)
     {
-        if (array_key_exists('email', $data) && array_key_exists('name', $data))
+        if (array_key_exists('user_id', $data) &&
+            array_key_exists('account_kind', $data) &&
+            (array_key_exists('amount', $data) || array_key_exists('credit', $data)))
         {
             return true;
         }
 
         return false;
     }
-    */
-
 }

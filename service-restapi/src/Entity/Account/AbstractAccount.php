@@ -2,11 +2,13 @@
 
 namespace App\Entity\Account;
 
-use App\Entity\Transaction\AbstractTransaction;
-use App\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+
+use App\Entity\User;
+use App\Entity\Transaction\AbstractTransaction;
 
 /**
  * @ORM\Entity
@@ -14,13 +16,18 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="account_kind", type="string")
  * @ORM\DiscriminatorMap({ "debit" = "DebitAccount", "credit" = "CreditAccount" })
+ * @ORM\HasLifecycleCallbacks
  */
 abstract class AbstractAccount
 {
+    const CREDIT_KIND = 'credit';
+    const DEBIT_KIND  = 'debit';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"basic"})
      */
     protected $id;
 
@@ -45,16 +52,27 @@ abstract class AbstractAccount
      */
     private $transactions;
 
+    /**
+     * @Groups({"basic"})
+     */
+    abstract public function getKind();
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
     }
 
+    /**
+     * @Groups({"basic"})
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @Groups({"basic"})
+     */
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->created_at;
@@ -67,6 +85,9 @@ abstract class AbstractAccount
         return $this;
     }
 
+    /**
+     * @Groups({"basic"})
+     */
     public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updated_at;
@@ -79,6 +100,23 @@ abstract class AbstractAccount
         return $this;
     }
 
+    /**
+     * @ORM\PrePersist
+     */
+    public function onPrePersist()
+    {
+        $this->created_at = new \DateTime("now");
+        $this->updated_at = new \DateTime("now");
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function onPreUpdate()
+    {
+        $this->updated_at = new \DateTime("now");
+    }
+
     public function getUser(): ?User
     {
         return $this->user;
@@ -89,6 +127,14 @@ abstract class AbstractAccount
         $this->user = $user;
 
         return $this;
+    }
+
+    /**
+     * @Groups({"basic"})
+     */
+    public function getUserId()
+    {
+        return $this->user->getId();
     }
 
     /**

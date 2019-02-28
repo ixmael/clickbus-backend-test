@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 use App\Entity\Account\iAccount;
@@ -18,16 +19,19 @@ class User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"basic"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
+     * @Groups({"basic"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"basic"})
      */
     private $name;
 
@@ -80,6 +84,9 @@ class User
         return $this;
     }
 
+    /**
+     * @Groups({"basic"})
+     */
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->created_at;
@@ -92,6 +99,9 @@ class User
         return $this;
     }
 
+    /**
+     * @Groups({"basic"})
+     */
     public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updated_at;

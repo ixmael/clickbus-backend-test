@@ -29,7 +29,7 @@ final class UserController extends AbstractController
     {
       $data = $this->userRepository->getAll();
       return new Response(
-          $serializer->serialize([ 'total' => count($data), 'data' => $data ], 'json'),
+          $serializer->serialize([ 'total' => count($data), 'data' => $data ], 'json', ['groups' => 'basic']),
           Response::HTTP_OK,
           ['content-type' => 'application/json']
       );
@@ -44,7 +44,7 @@ final class UserController extends AbstractController
       {
           $data = $this->userRepository->get($id);
           return new Response(
-              $serializer->serialize([ 'data' => $data ], 'json'),
+              $serializer->serialize([ 'data' => $data ], 'json', ['groups' => 'basic']),
               Response::HTTP_OK,
               ['content-type' => 'application/json']
           );
@@ -86,6 +86,7 @@ final class UserController extends AbstractController
             'result' => 'failed',
             'message' => '',
         ];
+        $groups = [];
 
         try
         {
@@ -93,6 +94,7 @@ final class UserController extends AbstractController
 
             $result['id'] = $user->getId();
             $result['result'] = 'created';
+            $groups = ['groups' => 'basic'];
             unset($result['message']);
             $responseCode = Response::HTTP_OK;
         }
@@ -102,7 +104,7 @@ final class UserController extends AbstractController
         }
 
         return new Response(
-            $serializer->serialize($result, 'json'),
+            $serializer->serialize($result, 'json', $groups),
             $responseCode,
             ['content-type' => 'application/json']
         );
@@ -136,6 +138,7 @@ final class UserController extends AbstractController
             'result' => 'failed',
             'message' => '',
         ];
+        $groups = [];
 
         try
         {
@@ -145,6 +148,7 @@ final class UserController extends AbstractController
             {
               $result['id'] = $user->getId();
               $result['result'] = 'updated';
+              $groups = ['groups' => 'basic'];
               unset($result['message']);
               $responseCode = Response::HTTP_OK;
             }
@@ -155,7 +159,7 @@ final class UserController extends AbstractController
         }
 
         return new Response(
-            $serializer->serialize($result, 'json'),
+            $serializer->serialize($result, 'json', $groups),
             $responseCode,
             ['content-type' => 'application/json']
         );
@@ -186,12 +190,6 @@ final class UserController extends AbstractController
             $result['message'] = $e->getMessage();
         }
 
-        return new Response(
-            $serializer->serialize($result, 'json'),
-            $responseCode,
-            ['content-type' => 'application/json']
-        );
-      
         return new Response(
             $serializer->serialize($result, 'json'),
             $responseCode,
