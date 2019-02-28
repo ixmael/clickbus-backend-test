@@ -90,6 +90,7 @@ class AccountRepository extends ServiceEntityRepository
         if ($account)
         {
             $updateElements = [];
+            $params = [];
 
             if (\array_key_exists('account_kind', $data) && $data['account_kind'] !== $account->getKind())
             {
@@ -135,8 +136,11 @@ class AccountRepository extends ServiceEntityRepository
                 join(',', $updateElements) .
                 ' WHERE `accounts`.`id` = ' . $account->getId() . ';';
 
-            $updateQuery = $this->em->getConnection()->prepare($query);
-            $updateQuery->execute($params);
+            if (count($updateElements) > 0)
+            {
+                $updateQuery = $this->em->getConnection()->prepare($query);
+                $updateQuery->execute($params);
+            }
 
             return $account;
         }

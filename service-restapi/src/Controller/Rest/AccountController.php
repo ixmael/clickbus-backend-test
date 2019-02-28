@@ -128,7 +128,11 @@ final class AccountController extends AbstractController
         }
 
         // Check if the request to update has the required data
-        $this->checkFieldsToUpdate($requestData, $serializer);
+        $checkedFields = $this->checkFieldsToUpdate($requestData, $serializer);
+        if (gettype($checkedFields) === 'object' && get_class($checkedFields) === Response::class)
+        {
+            return $checkedFields;
+        }
 
         $responseCode = Response::HTTP_CONFLICT;
         $result = [
@@ -241,23 +245,26 @@ final class AccountController extends AbstractController
 
     private function checkFieldsToUpdate($data, $serializer)
     {
-        if ($data['account_kind'] === AbstractAccount::CREDIT_KIND &&
+        if (\array_key_exists('account_kind', $data))
+        {
+            if ($data['account_kind'] === AbstractAccount::CREDIT_KIND &&
             (!\array_key_exists('credit', $data) || !\array_key_exists('limit_credit', $data)))
-        {
-            return new Response(
-                $serializer->serialize([ 'message' => 'The data is not complete to update a credit account' ], 'json'),
-                Response::HTTP_BAD_REQUEST,
-                ['content-type' => 'application/json']
-            );
-        }
+            {
+                return new Response(
+                    $serializer->serialize([ 'message' => 'The data is not complete to update a credit account' ], 'json'),
+                    Response::HTTP_BAD_REQUEST,
+                    ['content-type' => 'application/json']
+                );
+            }
 
-        if ($data['account_kind'] === AbstractAccount::DEBIT_KIND && !\array_key_exists('amount', $data))
-        {
-            return new Response(
-                $serializer->serialize([ 'message' => 'The data is not complete to update a debit account' ], 'json'),
-                Response::HTTP_BAD_REQUEST,
-                ['content-type' => 'application/json']
-            );
+            if ($data['account_kind'] === AbstractAccount::DEBIT_KIND && !\array_key_exists('amount', $data))
+            {
+                return new Response(
+                    $serializer->serialize([ 'message' => 'The data is not complete to update a debit account' ], 'json'),
+                    Response::HTTP_BAD_REQUEST,
+                    ['content-type' => 'application/json']
+                );
+            }
         }
     }
 }
