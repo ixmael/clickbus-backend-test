@@ -32,6 +32,16 @@ abstract class AbstractTransaction
      */
     private $account;
 
+    /**
+     * @ORM\Column(type="guid")
+     */
+    private $guid;
+
+    /**
+     * @ORM\Column(type="decimal", precision=32, scale=2)
+     */
+    private $amount;
+
     public function getKind(): ?string
     {
         return $this->kind;
@@ -57,6 +67,30 @@ abstract class AbstractTransaction
     public function setAccount(?AbstractAccount $account): self
     {
         $this->account = $account;
+
+        return $this;
+    }
+
+    public function getGuid(): ?string
+    {
+        return $this->guid;
+    }
+
+    public function setGuid(string $guid): self
+    {
+        $this->guid = $guid;
+
+        return $this;
+    }
+
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    public function setAmount($amount): self
+    {
+        $this->amount = $amount;
 
         return $this;
     }
