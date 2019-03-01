@@ -27,13 +27,6 @@ class TransactionControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
-    public function testExistsUpdateTransactions()
-    {
-        $client = static::createClient();
-        $client->request('PUT', '/api/transacciones/1');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-    }
-
     public function testExistsDeleteTransactions()
     {
         $client = static::createClient();

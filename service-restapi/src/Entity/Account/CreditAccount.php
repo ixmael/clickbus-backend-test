@@ -48,4 +48,19 @@ class CreditAccount extends AbstractAccount implements iAccount
 
         return $this;
     }
+
+    public function add($amount)
+    {
+        $this->setCredit($amount);
+    }
+
+    public function substract($amount)
+    {
+        $this->setCredit($this->credit - $amount);
+    }
+
+    public function getCurrentAmount()
+    {
+        return $this->credit;
+    }
 }

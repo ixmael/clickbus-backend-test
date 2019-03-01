@@ -90,4 +90,28 @@ class TransactionDebitControllerTests extends WebTestCase
         $this->assertArrayHasKey('current_amount', $responseData);
         $this->assertEquals(2550, $responseData['current_amount']);
     }
+
+    public function testDebitDelete()
+    {
+        $client = static::createClient();
+        $client->request(
+            'POST',
+            '/api/transacciones/7',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            \json_encode($newAccount)
+        );
+
+        $response = $client->getResponse();
+        $this->assertTrue($response->headers->contains('Content-Type', 'application/json'));
+
+        $responseData = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('result', $responseData);
+        $this->assertEquals('deleted', $responseData['result']);
+
+        $this->assertArrayHasKey('deleted', $responseData);
+        $this->assertEquals(500, $responseData['current_amount']);
+    }
 }
