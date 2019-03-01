@@ -16,6 +16,11 @@ class DebitAccount extends AbstractAccount implements iAccount
      */
     private $amount;
 
+    /**
+     * @ORM\Column(type="decimal", precision=32, scale=2)
+     */
+    private $current_amount;
+
     public function getAmount()
     {
         return $this->amount;
@@ -30,5 +35,17 @@ class DebitAccount extends AbstractAccount implements iAccount
 
     public function getKind() {
         return parent::DEBIT_KIND;
+    }
+
+    public function getCurrentAmount()
+    {
+        return $this->current_amount;
+    }
+
+    public function setCurrentAmount($current_amount): self
+    {
+        $this->current_amount = $current_amount;
+
+        return $this;
     }
 }
