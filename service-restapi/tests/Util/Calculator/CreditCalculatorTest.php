@@ -38,4 +38,26 @@ class CreditCalculatorTest extends TestCase
 
         $this->assertEquals(false, $result);
     }
+
+    public function testCanPay() {
+        $creditAccount = new CreditAccount();
+        $creditAccount->setCredit(1000);
+        $creditAccount->setLimitCredit(2000);
+
+        $calculator = new CreditCalculator($creditAccount);
+        $result = $calculator->canPay(500);
+
+        $this->assertEquals(true, $result);
+    }
+
+    public function testCannotPay() {
+        $creditAccount = new CreditAccount();
+        $creditAccount->setCredit(1000);
+        $creditAccount->setLimitCredit(2000);
+
+        $calculator = new CreditCalculator($creditAccount);
+        $result = $calculator->canPay(2000);
+
+        $this->assertEquals(false, $result);
+    }
 }

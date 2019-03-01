@@ -14,6 +14,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 abstract class AbstractTransaction
 {
+    const WITHDRAW = 'withdraw';
+    const PAY      = 'pay';
+    const COMMISSION = 'commission';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

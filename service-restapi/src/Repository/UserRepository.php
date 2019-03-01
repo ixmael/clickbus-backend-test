@@ -39,7 +39,7 @@ class UserRepository extends ServiceEntityRepository implements iAppRepository
             ->setParameter('id', $id)
             ->setMaxResults(1)
             ->getQuery()
-            ->getSingleResult();
+            ->getOneOrNullResult();
     }
 
     public function get($id)

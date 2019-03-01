@@ -33,4 +33,9 @@ class DebitCalculator implements iCalculator
 
         return false;
     }
+
+    public function canPay($amount)
+    {
+        return true;
+    }
 }

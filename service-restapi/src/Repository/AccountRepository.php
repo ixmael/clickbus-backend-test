@@ -43,7 +43,7 @@ class AccountRepository extends ServiceEntityRepository
             ->setParameter('id', $id)
             ->setMaxResults(1)
             ->getQuery()
-            ->getSingleResult();
+            ->getOneOrNullResult();
     }
 
     public function get($id)
@@ -53,7 +53,7 @@ class AccountRepository extends ServiceEntityRepository
             ->setParameter('id', $id)
             ->setMaxResults(1)
             ->getQuery()
-            ->getSingleResult();
+            ->getOneOrNullResult();
     }
 
     public function add(array $data)
@@ -72,6 +72,7 @@ class AccountRepository extends ServiceEntityRepository
             {
                 $account = new DebitAccount();
                 $account->setAmount($data['amount']);
+                $account->setCurrentAmount($data['amount']);
             }
             $account->setUser($user);
 
