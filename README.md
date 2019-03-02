@@ -1,51 +1,60 @@
 # Prueba de backend para Clickbus
 Esta es la implementación del ejercicio **Cash Machine** para **Clickbus**.
 
-El proyecto está realizado con PHP7 y Symfony4.
+El proyecto es una REST API realizada con [Symfony 4](https://symfony.com/). Esta REST API proporciona el acceso y operación a los siguientes recursos:
+* usuarios
+* cuentas
+* transacciones
 
 ## Directorios
-* **docker**: Es el directorio para las imágenes/contenedores docker.
+* **docker**: Imágenes docker para diferentes etapas del proyecto.
 * **service-api**: Es el servicio REST API del ejercicio.
-* **scripts**: Directorio con scripts utilitarios.
+* **scripts**: Scripts utilitarios para el proyecto.
 
 ## Docker
-Este proyecto utiliza imágenes docker para diferentes ambientes del proyecto. Para mayor detalle de cómo se utilizan estas visitar [contenedores docker](docker/README.md).
+Los ambientes considerados para este proyecto son:
+* develop
+* staging
+* prod
+cada uno de estos ambientes está constituido por imágenes docker.
 
-Para determinar el ambiente del proyecto se utiliza la variable de entorno *ENV_APP*. Los valores permitidos de *ENV_APP* son:
-* *prod*
-* *staging*
-* *development* (por defecto en caso de no existir alguno de los valores anteriores)
+Para más detalle de cómo utilizar estas imágenes y sus contenedores revisar [docker/README.me](docker/README.md).
 
-Los contenedores docker se pueden crear con el siguiente comando:
+## Desarrollo
+Ya sea utilizando el ambiente docker para desarrollo o el ambiente del sistema opreativo, para iniciar el proyecto se requiere:
+* archivo *.env*
+* generación de las tablas en la base de datos
+* iniciar el servidor de desarrollo
+
+El archivo *.env* debe estar dentro de la carpeta *service-restapi*. El archivo *service-restapi/.env* se puede tomar de referencia para configurar el archivo *.env*.
+
+La generación de las tablas se hace con el siguiente comando:
 ```bash
-sh scripts/build_docker.sh
-```
-El anterior script crea una red para los los contenedores docker. Para este proyecto se toman las siguientes IPs por servicio:
-* Base de datos: 6.6.6.7
-* Applicación: 6.6.6.11
-
-## Desarrollo del proyecto
-Debe de agregarse un archivo *.env* a la carpeta de *service-api* con la configuración de los parámetros para el proyecto.
-
-Agregar al archivo */etc/hosts* la siguiente línea para trabajar con un nombre en lugar de la IP:
-```
-6.6.6.11 clickbus.local
-```
-
-Ya sea con el contenedor de desarrollo o en el ambiente local, la forma de inicializar el proyecto es con los siguientes comandos dentro del directorio *service-resapi*:
-```bash
-# Instalar dependencia del proyecto
-composer install
-```
-
-```bash
-# Iniciar la base de datos
 php bin/console doctrine:migrations:migrate
 ```
 
-### Pruebas
-El proyecto viene con una lista de pruebas (unitarias y funcionales). Para llevarlas a cabo se ejecuta la siguiente instrucción:
+Si se está en un ambiente docker, con iniciar las imaǵenes de desarrollo se puede acceder a [http://clickbus.local][^1] para operar con la REST API. En otro caso acceder a la IP proporcionada por su ambiente.
+
+[^1]: se necesita configurar el archivo */etc/hosts* agregando la línea ```6.6.6.11 clickbus.local```. La IP *6.6.6.11* ha sido configurada como una red para las imágenes docker. La base de datos tiene la IP *6.6.6.7*.
+
+**Pruebas**
+Para ejecutar las pruebas del proyecto ejecutar el siguiente comando:
 ```bash
-# Ejecutión de las pruebas
 php bin/phpunit tests
+```
+
+## Staging
+**TODO**
+
+## Producción
+Este proyecto no contempla una infraestructura especifíca para el despliegue en producción. Para construir el proyecto especificamente para este ambiente se debe ejecutar:
+
+El archivo *.env* debe contener en la variable 
+
+```bash
+# Instalar paquetes
+APP_ENV=prod SYMFONY_ENV=prod composer install --no-dev --optimize-autoloader
+
+# Limpiar cache
+APP_ENV=prod APP_DEBUG=0 php bin/console cache:clear
 ```
