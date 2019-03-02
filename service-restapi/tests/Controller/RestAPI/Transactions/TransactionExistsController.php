@@ -2,9 +2,9 @@
 
 namespace App\Tests\Controller\RestAPI\Transaction;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Util\Test\FixtureTestCase;
 
-class TransactionControllerTest extends WebTestCase
+class TransactionControllerTest extends FixtureTestCase
 {
     public function testExistsGetTransactions()
     {
@@ -24,14 +24,14 @@ class TransactionControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request('POST', '/api/transacciones/');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
 
     public function testExistsUpdateTransactions()
     {
         $client = static::createClient();
         $client->request('PUT', '/api/transacciones/1');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
 
     public function testExistsDeleteTransactions()

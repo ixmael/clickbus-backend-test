@@ -42,4 +42,3 @@ INSERT INTO transactions VALUES
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;
-

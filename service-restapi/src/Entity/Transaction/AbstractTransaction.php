@@ -4,6 +4,7 @@ namespace App\Entity\Transaction;
 
 use App\Entity\Account\AbstractAccount;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
@@ -22,27 +23,32 @@ abstract class AbstractTransaction
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"basic"})
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=32)
+     * @Groups({"basic"})
      */
     protected $kind;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Account\AbstractAccount", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"basic"})
      */
     private $account;
 
     /**
      * @ORM\Column(type="guid")
+     * @Groups({"basic"})
      */
     private $guid;
 
     /**
      * @ORM\Column(type="decimal", precision=32, scale=2)
+     * @Groups({"basic"})
      */
     private $amount;
 

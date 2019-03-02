@@ -44,7 +44,7 @@ final class TransactionsController extends AbstractController
     {
         $transaction = $this->transactionRepository->get($id);
         return new Response(
-            $serializer->serialize([ 'data' => $transaction ], 'json'),
+            $serializer->serialize([ 'data' => $transaction ], 'json', ['groups' => 'basic']),
             Response::HTTP_OK,
             ['content-type' => 'application/json']
         );
@@ -105,24 +105,6 @@ final class TransactionsController extends AbstractController
             $responseCode,
             ['content-type' => 'application/json']
         );
-
-        return new Response(
-            $serializer->serialize([], 'json'),
-            Response::HTTP_OK,
-            ['content-type' => 'application/json']
-        );
-    }
-
-    /**
-     * @Route("/{id}", methods={"PUT"})
-     */
-    public function updateTransaction(Request $request, SerializerInterface $serializer, $id)
-    {
-        return new Response(
-            $serializer->serialize([], 'json'),
-            Response::HTTP_OK,
-            ['content-type' => 'application/json']
-        );
     }
 
     /**
@@ -130,11 +112,22 @@ final class TransactionsController extends AbstractController
      */
     public function delTransaction(Request $request, SerializerInterface $serializer, $id)
     {
-      return new Response(
-        $serializer->serialize([], 'json'),
-        Response::HTTP_OK,
-        ['content-type' => 'application/json']
-    );
+        $account = $this->transactionRepository->del($id);
+
+        if ($account)
+        {
+            return new Response(
+                $serializer->serialize([ 'result' => 'deleted', 'current_amount' => $account->getCurrentAmount() ], 'json', ['groups' => 'basic']),
+                Response::HTTP_OK,
+                ['content-type' => 'application/json']
+            );
+        }
+
+        return new Response(
+            $serializer->serialize([ 'message' => 'The transaction not exists' ], 'json'),
+            Response::HTTP_NOT_FOUND,
+            ['content-type' => 'application/json']
+        );
     }
 
     /**

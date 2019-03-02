@@ -2,9 +2,9 @@
 
 namespace App\Tests\Controller\RestAPI\Account;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Util\Test\FixtureTestCase;
 
-class AccountServiceControllerTest extends WebTestCase
+class AccountServiceControllerTest extends FixtureTestCase
 {
     public function testDataEmpty()
     {

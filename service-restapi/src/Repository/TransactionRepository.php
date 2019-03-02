@@ -109,13 +109,13 @@ class TransactionRepository extends ServiceEntityRepository
                     $guid = Uuid::uuid4();
 
                     $account->setCredit($account->getCredit() - $withdrawAmount);
-                    $transaction = new DebitTransaction();
+                    $transaction = new CreditTransaction();
                     $transaction->setAccount($account);
                     $transaction->setAmount($data['amount']);
                     $transaction->setGuid($guid->toString());
                     $transaction->setKind(AbstractTransaction::WITHDRAW);
 
-                    $commission = new DebitTransaction();
+                    $commission = new CreditTransaction();
                     $commission->setAccount($account);
                     $commission->setAmount($calculator->getItems()['commision']);
                     $commission->setGuid($guid->toString());
@@ -195,14 +195,25 @@ class TransactionRepository extends ServiceEntityRepository
 
     public function del($id)
     {
-        $user = $this->exists($id);
+        $transaction = $this->exists($id);
 
-        if ($user)
+        if ($transaction)
         {
-            $this->em->remove($user);
+            $account = $transaction->getAccount();
+            if ($transaction->getKind() === AbstractTransaction::WITHDRAW)
+            {
+                $account->add($transaction->getAmount());
+            }
+            elseif ($transaction->getKind() === AbstractTransaction::PAY)
+            {
+                $account->substract($transaction->getAmount());
+            }
+
+            $this->em->remove($transaction);
+            $this->em->persist($account);
             $this->em->flush();
 
-            return true;
+            return $account;
         }
 
         return false;

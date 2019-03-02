@@ -48,4 +48,14 @@ class DebitAccount extends AbstractAccount implements iAccount
 
         return $this;
     }
+
+    public function add($amount)
+    {
+        $this->setCurrentAmount($this->current_amount + $amount);
+    }
+
+    public function substract($amount)
+    {
+        $this->setCurrentAmount($this->current_amount - $amount);
+    }
 }
