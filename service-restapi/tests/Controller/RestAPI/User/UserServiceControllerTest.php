@@ -2,9 +2,9 @@
 
 namespace App\Tests\Controller\RestAPI\User;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Util\Test\FixtureTestCase;
 
-class UserServiceControllerTest extends WebTestCase
+class UserServiceControllerTest extends FixtureTestCase
 {
     public function testServiceGetUsers()
     {

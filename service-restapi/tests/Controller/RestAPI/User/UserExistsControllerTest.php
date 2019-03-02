@@ -2,9 +2,9 @@
 
 namespace App\Tests\Controller\RestAPI\User;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Util\Test\FixtureTestCase;
 
-class UserControllerTest extends WebTestCase
+class UserControllerTest extends FixtureTestCase
 {
     public function testExistsGetUsers()
     {
@@ -24,14 +24,14 @@ class UserControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request('POST', '/api/usuarios/');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
 
     public function testExistsUpdateUser()
     {
         $client = static::createClient();
         $client->request('PUT', '/api/usuarios/1');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
 
     public function testExistsDeleteUser()

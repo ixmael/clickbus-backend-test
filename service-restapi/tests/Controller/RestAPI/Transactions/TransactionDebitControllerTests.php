@@ -2,9 +2,9 @@
 
 namespace App\Tests\Controller\RestAPI\Transactions;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Util\Test\FixtureTestCase;
 
-class TransactionDebitControllerTests extends WebTestCase
+class TransactionDebitControllerTests extends FixtureTestCase
 {
     public function testDebitAmount()
     {

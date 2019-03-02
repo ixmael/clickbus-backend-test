@@ -2,9 +2,9 @@
 
 namespace App\Tests\Controller\RestAPI\Transactions;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Util\Test\FixtureTestCase;
 
-class TransactionCreditControllerTests extends WebTestCase
+class TransactionCreditControllerTests extends FixtureTestCase
 {
     public function testCreditAmount()
     {

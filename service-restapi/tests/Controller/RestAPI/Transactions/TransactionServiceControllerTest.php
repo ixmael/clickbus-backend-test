@@ -2,9 +2,9 @@
 
 namespace App\Tests\Controller\RestAPI\Account;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Util\Test\FixtureTestCase;
 
-class TransactionServiceControllerTest extends WebTestCase
+class TransactionServiceControllerTest extends FixtureTestCase
 {
     public function testServiceGetTransactions()
     {
